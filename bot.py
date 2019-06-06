@@ -24,12 +24,18 @@ def cancel(bot,updater):
     updater.message.reply_text('Good bye')
     return ConversationHandler.END
 
+def help(bot, updater):
+    updater.message.reply_text('Bot started')
+
 def main():
-    TOKEN = '889590521:AAGtW7X2N9fVCcegFRo0hoh5WHcefIETrxs'
+
+    TOKEN = os.environ['TELEGRAM_TOKEN']
+    PORT = int(os.environ.get('PORT', '8443'))
     updater = Updater(TOKEN)
 
     dispatcer = updater.dispatcher
     command = CommandHandler('help',help)
+
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states = { INITIAL: [MessageHandler(Filters.text, say_hello),CommandHandler('init', start)],
@@ -39,8 +45,10 @@ def main():
     )
     dispatcer.add_handler(conv_handler)
     dispatcer.add_handler(command)
-    updater.start_polling()
-    #updater.start_webhook()
+    #updater.start_polling()
+
+    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
+    updater.bot.set_webhook("https://telegrambot31431.herokuapp.com/" + TOKEN)
     updater.idle()
 
 
